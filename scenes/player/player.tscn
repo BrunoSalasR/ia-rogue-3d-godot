@@ -1,0 +1,127 @@
+[gd_scene load_steps=12 format=3 uid="uid://iarogue_player"]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" path="res://assets/characters/placeholder/mc_cube/null_cube.tscn" id="2_cube"]
+[ext_resource type="PackedScene" uid="uid://cl4v5ryyauaai" path="res://assets/characters/placeholder/mc_adventurer/Adventurer.gltf" id="3_android"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.28
+height = 0.85
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_attack"]
+radius = 2.2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hackeo"]
+radius = 4.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_torso"]
+size = Vector3(0.46, 0.52, 0.28)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder_l"]
+size = Vector3(0.14, 0.18, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder_r"]
+size = Vector3(0.14, 0.18, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+size = Vector3(0.32, 0.26, 0.22)
+
+[sub_resource type="BoxMesh" id="BoxMesh_eye"]
+size = Vector3(0.18, 0.06, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leg_l"]
+size = Vector3(0.14, 0.28, 0.14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leg_r"]
+size = Vector3(0.14, 0.28, 0.14)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dash"]
+emission_shape = 1
+emission_box_extents = Vector3(0.18, 0.25, 0.18)
+direction = Vector3(0, 0, 0)
+spread = 30.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.1
+initial_velocity_max = 0.3
+scale_min = 0.05
+scale_max = 0.08
+color = Color(0, 0.8, 1, 0.75)
+hue_variation_max = 0.02
+alpha_curve = null
+
+[sub_resource type="QuadMesh" id="QuadMesh_dash_particle"]
+size = Vector2(0.08, 0.08)
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+script = ExtResource("1_player")
+collision_layer = 2
+collision_mask = 1
+start_form = "android"
+cube_model_scene = ExtResource("2_cube")
+android_model_scene = ExtResource("3_android")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.43, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="MeshPivot" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0)
+mesh = SubResource("BoxMesh_torso")
+cast_shadow = 1
+
+[node name="ShoulderL" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.57, 0)
+mesh = SubResource("BoxMesh_shoulder_l")
+cast_shadow = 1
+
+[node name="ShoulderR" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.57, 0)
+mesh = SubResource("BoxMesh_shoulder_r")
+cast_shadow = 1
+
+[node name="Head" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.93, 0)
+mesh = SubResource("BoxMesh_head")
+cast_shadow = 1
+
+[node name="Eye" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, -0.12)
+mesh = SubResource("BoxMesh_eye")
+cast_shadow = 0
+
+[node name="LegL" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.14, 0.14, 0)
+mesh = SubResource("BoxMesh_leg_l")
+cast_shadow = 1
+
+[node name="LegR" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 0.14, 0)
+mesh = SubResource("BoxMesh_leg_r")
+cast_shadow = 1
+
+[node name="VisualModelAnchor" type="Node3D" parent="MeshPivot"]
+
+[node name="AttackArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="AttackShape" type="CollisionShape3D" parent="AttackArea"]
+shape = SubResource("SphereShape3D_attack")
+
+[node name="HackeoArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="HackeoShape" type="CollisionShape3D" parent="HackeoArea"]
+shape = SubResource("SphereShape3D_hackeo")
+
+[node name="DashParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+emitting = false
+amount = 20
+lifetime = 0.3
+one_shot = true
+draw_pass_1 = SubResource("QuadMesh_dash_particle")
+process_material = SubResource("ParticleProcessMaterial_dash")

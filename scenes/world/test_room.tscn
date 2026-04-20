@@ -1,0 +1,151 @@
+[gd_scene load_steps=11 format=3 uid="uid://iarogue_testroom"]
+
+[ext_resource type="Script" path="res://scripts/world/room.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/world/enemy_spawn_point.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/regulated_enemy.tscn" id="3_enemy"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(22.0, 0.5, 22.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(22.0, 0.5, 22.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wallH"]
+size = Vector3(23.0, 2.5, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wallH"]
+size = Vector3(23.0, 2.5, 0.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wallV"]
+size = Vector3(0.6, 2.5, 23.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wallV"]
+size = Vector3(0.6, 2.5, 23.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pillar"]
+size = Vector3(1.2, 2.0, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pillar"]
+size = Vector3(1.2, 2.0, 1.2)
+
+[node name="TestRoom" type="Node3D"]
+script = ExtResource("1_room")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BoxMesh_floor")
+cast_shadow = 0
+
+[node name="FloorShape" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -11.3)
+collision_layer = 1
+
+[node name="WallNorthMesh" type="MeshInstance3D" parent="Walls/WallNorth"]
+mesh = SubResource("BoxMesh_wallH")
+
+[node name="WallNorthShape" type="CollisionShape3D" parent="Walls/WallNorth"]
+shape = SubResource("BoxShape3D_wallH")
+
+[node name="WallSouth" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 11.3)
+collision_layer = 1
+
+[node name="WallSouthMesh" type="MeshInstance3D" parent="Walls/WallSouth"]
+mesh = SubResource("BoxMesh_wallH")
+
+[node name="WallSouthShape" type="CollisionShape3D" parent="Walls/WallSouth"]
+shape = SubResource("BoxShape3D_wallH")
+
+[node name="WallWest" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3, 1.25, 0)
+collision_layer = 1
+
+[node name="WallWestMesh" type="MeshInstance3D" parent="Walls/WallWest"]
+mesh = SubResource("BoxMesh_wallV")
+
+[node name="WallWestShape" type="CollisionShape3D" parent="Walls/WallWest"]
+shape = SubResource("BoxShape3D_wallV")
+
+[node name="WallEast" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 1.25, 0)
+collision_layer = 1
+
+[node name="WallEastMesh" type="MeshInstance3D" parent="Walls/WallEast"]
+mesh = SubResource("BoxMesh_wallV")
+
+[node name="WallEastShape" type="CollisionShape3D" parent="Walls/WallEast"]
+shape = SubResource("BoxShape3D_wallV")
+
+[node name="Pillars" type="Node3D" parent="."]
+
+[node name="PillarNE" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 1.0, -6.0)
+collision_layer = 1
+
+[node name="PillarNEMesh" type="MeshInstance3D" parent="Pillars/PillarNE"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="PillarNEShape" type="CollisionShape3D" parent="Pillars/PillarNE"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="PillarNW" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0, 1.0, -6.0)
+collision_layer = 1
+
+[node name="PillarNWMesh" type="MeshInstance3D" parent="Pillars/PillarNW"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="PillarNWShape" type="CollisionShape3D" parent="Pillars/PillarNW"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="PillarSE" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0, 1.0, 6.0)
+collision_layer = 1
+
+[node name="PillarSEMesh" type="MeshInstance3D" parent="Pillars/PillarSE"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="PillarSEShape" type="CollisionShape3D" parent="Pillars/PillarSE"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="PillarSW" type="StaticBody3D" parent="Pillars"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.0, 1.0, 6.0)
+collision_layer = 1
+
+[node name="PillarSWMesh" type="MeshInstance3D" parent="Pillars/PillarSW"]
+mesh = SubResource("BoxMesh_pillar")
+
+[node name="PillarSWShape" type="CollisionShape3D" parent="Pillars/PillarSW"]
+shape = SubResource("BoxShape3D_pillar")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="SpawnNE" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.6, 5)
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("3_enemy")
+
+[node name="SpawnNW" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0.6, -5)
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("3_enemy")
+
+[node name="SpawnSE" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.6, -5)
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("3_enemy")
+
+[node name="SpawnSW" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.6, 4)
+script = ExtResource("2_spawn")
+enemy_scene = ExtResource("3_enemy")

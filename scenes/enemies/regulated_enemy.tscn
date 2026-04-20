@@ -1,0 +1,84 @@
+[gd_scene load_steps=10 format=3 uid="uid://iarogue_regenemy"]
+
+[ext_resource type="Script" path="res://scripts/enemies/regulated_enemy.gd" id="1_enemy"]
+[ext_resource type="PackedScene" path="res://assets/characters/placeholder/enemy_regulated/Enemy_Small.gltf" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.30
+height = 0.90
+
+[sub_resource type="BoxMesh" id="BoxMesh_cage"]
+size = Vector3(0.52, 0.72, 0.32)
+
+[sub_resource type="BoxMesh" id="BoxMesh_core"]
+size = Vector3(0.20, 0.20, 0.20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sensor"]
+size = Vector3(0.08, 0.28, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plate_l"]
+size = Vector3(0.10, 0.42, 0.22)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plate_r"]
+size = Vector3(0.10, 0.42, 0.22)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hackeo"]
+emission_shape = 2
+emission_sphere_radius = 0.3
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.2
+initial_velocity_max = 0.9
+scale_min = 0.04
+scale_max = 0.08
+color = Color(0, 0.78, 0.92, 0.85)
+
+[sub_resource type="QuadMesh" id="QuadMesh_hackeo_particle"]
+size = Vector2(0.07, 0.07)
+
+[node name="RegulatedEnemy" type="CharacterBody3D" groups=["enemy"]]
+script = ExtResource("1_enemy")
+collision_layer = 4
+collision_mask = 3
+model_scene = ExtResource("2_model")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="MeshPivot" type="Node3D" parent="."]
+
+[node name="Cage" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0)
+mesh = SubResource("BoxMesh_cage")
+cast_shadow = 1
+
+[node name="Core" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0)
+mesh = SubResource("BoxMesh_core")
+cast_shadow = 0
+
+[node name="Sensor" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, -0.18)
+mesh = SubResource("BoxMesh_sensor")
+cast_shadow = 0
+
+[node name="PlateL" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.34, 0.52, 0)
+mesh = SubResource("BoxMesh_plate_l")
+cast_shadow = 1
+
+[node name="PlateR" type="MeshInstance3D" parent="MeshPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 0.52, 0)
+mesh = SubResource("BoxMesh_plate_r")
+cast_shadow = 1
+
+[node name="VisualModelAnchor" type="Node3D" parent="MeshPivot"]
+
+[node name="HackeoParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 0.52, 0)
+emitting = false
+amount = 40
+lifetime = 1.2
+one_shot = true
+draw_pass_1 = SubResource("QuadMesh_hackeo_particle")
+process_material = SubResource("ParticleProcessMaterial_hackeo")

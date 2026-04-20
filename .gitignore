@@ -1,0 +1,34 @@
+# Godot 4
+.godot/
+.import/
+export_presets.cfg
+*.translation
+
+# Builds / exports
+export/
+builds/
+*.exe
+*.pck
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+*~
+
+# IDE / Cursor
+.cursor/
+.vscode/
+*.code-workspace
+
+# Logs / captures (optional local artifacts)
+*.log
+art_pass*.png
+movie_out/
+
+# Python / tools (if added later)
+__pycache__/
+*.pyc
+.venv/

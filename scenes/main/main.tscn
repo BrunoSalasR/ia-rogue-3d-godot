@@ -1,0 +1,239 @@
+[gd_scene load_steps=10 format=3 uid="uid://bni3mvpra7lc"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/camera/pixel_camera_rig.gd" id="2_camrig"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="3_hud"]
+[ext_resource type="Shader" path="res://assets/shaders/canvas_item/upscale_and_offset.gdshader" id="4_upscale"]
+[ext_resource type="Shader" path="res://assets/shaders/spatial/outlines.gdshader" id="5_outlines"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_upscale"]
+shader = ExtResource("4_upscale")
+shader_parameter/texel_offset = Vector2(0, 0)
+shader_parameter/contrast_boost = 1.08
+shader_parameter/posterize_mix = 0.82
+shader_parameter/highlight_ceil = 0.94
+shader_parameter/palette_steps = 28.0
+shader_parameter/saturation_boost = 1.06
+shader_parameter/vignette_strength = 0.16
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 1
+background_color = Color(0.05, 0.06, 0.09, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.24, 0.28, 0.34, 1)
+ambient_light_energy = 0.55
+glow_enabled = false
+glow_normalized = true
+glow_intensity = 0.0
+glow_bloom = 0.0
+fog_enabled = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_outlines"]
+render_priority = 100
+shader = ExtResource("5_outlines")
+shader_parameter/line_tint = Color(0.05, 0.05, 0.08, 1)
+shader_parameter/crease_tint = Color(0.95, 0.74, 0.10, 1)
+shader_parameter/flip_palettes = false
+shader_parameter/near_tint = Color(1.04, 1.01, 0.98, 1)
+shader_parameter/far_tint = Color(0.80, 0.88, 1.12, 1)
+shader_parameter/depth_tint_strength = 0.42
+shader_parameter/line_overlay = true
+shader_parameter/line_alpha = 0.83
+shader_parameter/crease_overlay = true
+shader_parameter/crease_alpha = 0.70
+shader_parameter/kernel_radius = 1.0
+shader_parameter/zdelta_cutoff = 0.21
+shader_parameter/angle_z_cutoff = 0.5
+shader_parameter/angle_z_scale = 2.0
+shader_parameter/convex_cutoff = 0.09
+shader_parameter/crease_feather = 0.06
+shader_parameter/concave_cutoff = 0.01
+shader_parameter/concave_z_cutoff = 0.5
+
+[sub_resource type="QuadMesh" id="QuadMesh_outline"]
+size = Vector2(2000, 2000)
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="SVContainer" type="SubViewportContainer" parent="."]
+material = SubResource("ShaderMaterial_upscale")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SVContainer"]
+handle_input_locally = false
+size = Vector2i(320, 180)
+render_target_update_mode = 4
+positional_shadow_atlas_size = 2048
+positional_shadow_atlas_16_bits = false
+msaa_3d = 0
+default_canvas_item_texture_filter = 0
+screen_space_aa = 0
+use_taa = false
+use_debanding = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SVContainer/SubViewport"]
+environment = SubResource("Environment_world")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SVContainer/SubViewport"]
+transform = Transform3D(0.70710677, -0.353553, 0.6123724, 0, 0.8660254, 0.5, -0.70710677, -0.353553, 0.6123724, 4, 15, 4)
+light_color = Color(1, 0.94, 0.86, 1)
+light_energy = 1.5
+shadow_enabled = true
+directional_shadow_mode = 0
+directional_shadow_max_distance = 60.0
+directional_shadow_split_1 = 0.15
+directional_shadow_split_2 = 0.35
+directional_shadow_split_3 = 0.7
+shadow_bias = 0.04
+shadow_normal_bias = 0.5
+shadow_opacity = 1.0
+shadow_blur = 0.0
+
+[node name="CameraRig" type="Node3D" parent="SVContainer/SubViewport"]
+script = ExtResource("2_camrig")
+
+[node name="Camera3D" type="Camera3D" parent="SVContainer/SubViewport/CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 14.14, 14.14)
+projection = 1
+size = 12.0
+near = 0.1
+far = 800.0
+current = true
+
+[node name="GameWorld" type="Node3D" parent="SVContainer/SubViewport"]
+
+[node name="OutlineEffect" type="MeshInstance3D" parent="SVContainer/SubViewport"]
+material_override = SubResource("ShaderMaterial_outlines")
+cast_shadow = 0
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_outline")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+process_mode = 3
+script = ExtResource("3_hud")
+
+[node name="Root" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BottomLeft" type="VBoxContainer" parent="HUD/Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = -78.0
+offset_right = 210.0
+offset_bottom = -14.0
+grow_vertical = 0
+
+[node name="HPLabel" type="Label" parent="HUD/Root/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "// HP"
+
+[node name="HPBar" type="ProgressBar" parent="HUD/Root/BottomLeft"]
+custom_minimum_size = Vector2(190, 10)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="CiclosLabel" type="Label" parent="HUD/Root/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.3, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "// CICLOS"
+
+[node name="CiclosBar" type="ProgressBar" parent="HUD/Root/BottomLeft"]
+custom_minimum_size = Vector2(190, 8)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="BottomRight" type="VBoxContainer" parent="HUD/Root"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -210.0
+offset_top = -72.0
+offset_right = -14.0
+offset_bottom = -14.0
+grow_horizontal = 0
+grow_vertical = 0
+alignment = 2
+
+[node name="DashCharges" type="HBoxContainer" parent="HUD/Root/BottomRight"]
+layout_mode = 2
+alignment = 2
+
+[node name="Dash1" type="ColorRect" parent="HUD/Root/BottomRight/DashCharges"]
+custom_minimum_size = Vector2(22, 8)
+layout_mode = 2
+color = Color(0, 0.82, 1, 1)
+
+[node name="Gap1" type="Control" parent="HUD/Root/BottomRight/DashCharges"]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+
+[node name="Dash2" type="ColorRect" parent="HUD/Root/BottomRight/DashCharges"]
+custom_minimum_size = Vector2(22, 8)
+layout_mode = 2
+color = Color(0, 0.82, 1, 1)
+
+[node name="Gap2" type="Control" parent="HUD/Root/BottomRight/DashCharges"]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
+
+[node name="Dash3" type="ColorRect" parent="HUD/Root/BottomRight/DashCharges"]
+custom_minimum_size = Vector2(22, 8)
+layout_mode = 2
+color = Color(0, 0.82, 1, 1)
+
+[node name="FragmentsLabel" type="Label" parent="HUD/Root/BottomRight"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.1, 1)
+theme_override_font_sizes/font_size = 10
+text = "// FRAG :: 00000"
+horizontal_alignment = 2
+
+[node name="NarrativeBox" type="PanelContainer" parent="HUD/Root"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 1.0
+anchor_right = 0.92
+anchor_bottom = 1.0
+offset_top = -130.0
+offset_bottom = -18.0
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="HUD/Root/NarrativeBox"]
+layout_mode = 2
+
+[node name="Speaker" type="Label" parent="HUD/Root/NarrativeBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.82, 1, 1)
+theme_override_font_sizes/font_size = 9
+text = "// MC ::"
+
+[node name="Text" type="Label" parent="HUD/Root/NarrativeBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
