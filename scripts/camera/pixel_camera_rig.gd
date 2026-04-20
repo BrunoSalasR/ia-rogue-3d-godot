@@ -12,6 +12,8 @@ extends Node3D
 @export var intro_test_view: bool = true
 @export var view_offset_xz: Vector2 = Vector2(0.0, -0.8)
 @export var vertical_follow_damp: float = 0.25
+@export var internal_resolution: Vector2i = Vector2i(320, 180)
+@export var debug_trace_follow: bool = false
 
 var follow_target: Node3D = null
 var _pixel_size:   float  = 0.0   # computed from SubViewport height at runtime
@@ -23,16 +25,51 @@ var _p_was_down: bool = false
 var _upscale_material: ShaderMaterial = null
 var _intro_preset_applied: bool = false
 var _smoothed_y: float = 0.0
+var _last_viewport_size: Vector2i = Vector2i(-1, -1)
 
 @onready var camera: Camera3D = $Camera3D
 
+func _render_viewport_size() -> Vector2i:
+	# CameraRig lives under SubViewport; use that size, not root window size.
+	var p := get_parent()
+	if p is SubViewport:
+		return (p as SubViewport).size
+	var vp := get_viewport()
+	return vp.size if vp else Vector2i.ZERO
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_ensure_internal_resolution()
 	_apply_intro_test_preset()
 	_angle_idx = _nearest_angle_idx(angle_x_deg)
 	_configure_camera()
 	_compute_pixel_size()
 	_bind_upscale_material()
+	# SubViewport puede tener tamaño 0 en el primer frame; re-sync al estar listo.
+	call_deferred("_deferred_viewport_sync")
+
+
+func _deferred_viewport_sync() -> void:
+	_ensure_internal_resolution()
+	_last_viewport_size = _render_viewport_size()
+	_refresh_viewport_dependent()
+
+
+func _refresh_viewport_dependent() -> void:
+	_ensure_internal_resolution()
+	_compute_pixel_size()
+	if intro_test_view:
+		var h := float(max(_render_viewport_size().y, 1))
+		ortho_size = 3.6 * (h / 256.0)
+		_configure_camera()
+	_bind_upscale_material()
+
+func _ensure_internal_resolution() -> void:
+	var p := get_parent()
+	if p is SubViewport:
+		var sv := p as SubViewport
+		if sv.size != internal_resolution:
+			sv.size = internal_resolution
 
 func _apply_intro_test_preset() -> void:
 	if _intro_preset_applied or not intro_test_view:
@@ -43,9 +80,9 @@ func _apply_intro_test_preset() -> void:
 	arm_distance = 12.0
 	# Keep constant world-units-per-pixel when internal resolution changes (Holland-style 320×180, etc.).
 	var h := 256.0
-	var vp := get_viewport()
-	if vp:
-		h = float(max(vp.size.y, 1))
+	var sz := _render_viewport_size()
+	if sz.y > 0:
+		h = float(sz.y)
 	ortho_size = 3.6 * (h / 256.0)
 	_intro_preset_applied = true
 
@@ -63,8 +100,9 @@ func _compute_pixel_size() -> void:
 	# Pixel size = world units covered by one rendered pixel (vertically).
 	# This must match the SubViewport height for perfect grid-lock.
 	var vp := get_viewport()
-	if vp:
-		var h := float(vp.size.y)
+	var sz := _render_viewport_size()
+	if sz.y > 0:
+		var h := float(sz.y)
 		_pixel_size = ortho_size / h if h > 0 else 0.0556
 	else:
 		_pixel_size = 0.0556   # fallback for 320×180 / size=10
@@ -72,6 +110,11 @@ func _compute_pixel_size() -> void:
 func _process(delta: float) -> void:
 	_handle_debug_input()
 	camera.current = true
+
+	var vp_sz := _render_viewport_size()
+	if vp_sz != _last_viewport_size:
+		_last_viewport_size = vp_sz
+		_refresh_viewport_dependent()
 
 	if not follow_target:
 		follow_target = get_tree().get_first_node_in_group("player")
@@ -100,6 +143,8 @@ func _process(delta: float) -> void:
 	_smoothed_y = lerpf(_smoothed_y, snapped.y, clampf(delta * vertical_follow_damp, 0.0, 1.0))
 	snapped.y = _smoothed_y
 	global_position = snapped
+	if debug_trace_follow and (Engine.get_frames_drawn() % 60 == 0):
+		print("[cam] target=", follow_target.global_position, " rig=", global_position, " px=", _pixel_size)
 
 	# Subpixel compensation to recover smooth movement without pixel crawl.
 	var err := _smooth_follow_pos - snapped
@@ -144,8 +189,11 @@ func force_snap_to_target() -> void:
 	if follow_target:
 		var desired := follow_target.global_position
 		desired.y = 0.0
+		desired.x += view_offset_xz.x
+		desired.z += view_offset_xz.y
 		_smooth_follow_pos = desired
 		_has_follow_seed = true
+		_smoothed_y = desired.y
 		global_position = desired
 		_pixel_snap()
 		_apply_texel_offset(Vector2.ZERO)
@@ -154,9 +202,9 @@ func attach_to_target(node: Node3D) -> void:
 	if not node:
 		return
 	follow_target = node
-	if get_parent() != node:
-		reparent(node)
-	position = Vector3.ZERO
+	# No reparentear bajo el jugador: el rig debe quedar bajo SubViewport para que
+	# global_position + snap + subpíxeles funcionen sin pelear con la jerarquía.
+	_has_follow_seed = false
 	force_snap_to_target()
 
 func _bind_upscale_material() -> void:

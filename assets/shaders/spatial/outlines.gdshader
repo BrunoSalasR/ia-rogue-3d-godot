@@ -1,6 +1,5 @@
 shader_type spatial;
-// Draw after opaque world; depth_test_disabled keeps the quad from failing depth so outlines composite on top.
-render_mode depth_prepass_alpha, unshaded, depth_test_disabled;
+render_mode depth_prepass_alpha, unshaded;
 
 uniform sampler2D screen_texture           : hint_screen_texture,           repeat_disable, filter_nearest;
 uniform sampler2D depth_texture            : hint_depth_texture,            repeat_disable, filter_nearest;

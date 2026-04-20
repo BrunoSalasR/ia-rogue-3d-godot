@@ -1,4 +1,4 @@
-extends Room
+extends "res://scripts/world/room.gd"
 class_name ProtoMapRoom
 
 const ENEMY_SCENE := preload("res://scenes/enemies/regulated_enemy.tscn")
@@ -36,11 +36,12 @@ func _build_clean_stage() -> void:
 
 	var ground := StaticBody3D.new()
 	ground.collision_layer = 1
+	ground.collision_mask = 2
 	geo.add_child(ground)
 
 	var ground_mesh := MeshInstance3D.new()
 	var plane := BoxMesh.new()
-	plane.size = Vector3(180.0, 0.5, 180.0)
+	plane.size = Vector3(180.0, 8.0, 180.0)
 	ground_mesh.mesh = plane
 	ground_mesh.material_override = _make_floor_mat_for_demo()
 	ground_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -49,11 +50,12 @@ func _build_clean_stage() -> void:
 
 	var col := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(180.0, 0.5, 180.0)
+	shape.size = Vector3(180.0, 8.0, 180.0)
 	col.shape = shape
 	ground.add_child(col)
 
-	ground.position = Vector3(0.0, -0.25, 0.0)
+	# Thick floor avoids rare tunneling/fall-through during dash + gravity.
+	ground.position = Vector3(0.0, -4.0, 0.0)
 
 	# Invisible walls so arena is bounded without visual clutter.
 	_add_invisible_wall(geo, Vector3(180.0, 6.0, 1.0), Vector3(0.0, 3.0, -90.0))
@@ -89,7 +91,7 @@ func _build_clean_lighting() -> void:
 	var key := OmniLight3D.new()
 	key.position = Vector3(-2.4, 3.2, 2.2)
 	key.light_color = Color(1.0, 0.97, 0.92, 1.0)
-	key.light_energy = 0.42 if demo_look != DemoLook.REF_VIDEO_DEVLOG else 0.30
+	key.light_energy = 0.34 if demo_look != DemoLook.REF_VIDEO_DEVLOG else 0.16
 	key.omni_range = 10.0
 	key.shadow_enabled = false
 	add_child(key)
@@ -97,7 +99,7 @@ func _build_clean_lighting() -> void:
 	var rim := OmniLight3D.new()
 	rim.position = Vector3(3.2, 2.4, -2.4)
 	rim.light_color = Color(0.58, 0.78, 1.0, 1.0)
-	rim.light_energy = 0.30 if demo_look != DemoLook.REF_VIDEO_DEVLOG else 0.18
+	rim.light_energy = 0.22 if demo_look != DemoLook.REF_VIDEO_DEVLOG else 0.10
 	rim.omni_range = 9.0
 	rim.shadow_enabled = false
 	add_child(rim)
@@ -126,15 +128,15 @@ func _make_ref_video_devlog_floor_mat() -> ShaderMaterial:
 	mat.set_shader_parameter("cell_size", 2.15)
 	mat.set_shader_parameter("line_width", 0.024)
 	mat.set_shader_parameter("grout_weight", 0.62)
-	mat.set_shader_parameter("contrast", 1.08)
+	mat.set_shader_parameter("contrast", 1.04)
 	mat.set_shader_parameter("checker_strength", 1.0)
 	mat.set_shader_parameter("micro_dither", 0.003)
 	mat.set_shader_parameter("pattern_rotation", 0.7853981633)
-	mat.set_shader_parameter("shadow_darkness", 0.30)
+	mat.set_shader_parameter("shadow_darkness", 0.24)
 	mat.set_shader_parameter("shadow_cool", 0.1)
-	mat.set_shader_parameter("light_bands", 5.0)
+	mat.set_shader_parameter("light_bands", 4.0)
 	mat.set_shader_parameter("pixel_grid_size", 0.13)
-	mat.set_shader_parameter("albedo_cap", 0.86)
+	mat.set_shader_parameter("albedo_cap", 0.82)
 	return mat
 
 
@@ -240,6 +242,7 @@ func _make_specular_ramp_texture() -> GradientTexture1D:
 func _add_invisible_wall(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 	var wall := StaticBody3D.new()
 	wall.collision_layer = 1
+	wall.collision_mask = 2
 	parent.add_child(wall)
 	var col := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
@@ -251,6 +254,7 @@ func _add_invisible_wall(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 func _add_hero_rock(parent: Node3D, pos: Vector3) -> void:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
+	body.collision_mask = 2
 	parent.add_child(body)
 	body.position = pos
 
@@ -294,6 +298,7 @@ func _add_hero_rock(parent: Node3D, pos: Vector3) -> void:
 func _add_soft_pillar(parent: Node3D, pos: Vector3, size: Vector3) -> void:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
+	body.collision_mask = 2
 	parent.add_child(body)
 	body.position = pos
 
@@ -328,16 +333,17 @@ func _build_legacy_stage() -> void:
 	add_child(geo)
 	var floor := StaticBody3D.new()
 	floor.collision_layer = 1
+	floor.collision_mask = 2
 	geo.add_child(floor)
 	var mesh := MeshInstance3D.new()
 	var box := BoxMesh.new()
-	box.size = Vector3(120.0, 0.5, 120.0)
+	box.size = Vector3(120.0, 8.0, 120.0)
 	mesh.mesh = box
-	mesh.material_override = _make_reference_floor_mat()
+	mesh.material_override = _make_floor_mat_for_demo()
 	floor.add_child(mesh)
 	var col := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(120.0, 0.5, 120.0)
+	shape.size = Vector3(120.0, 8.0, 120.0)
 	col.shape = shape
 	floor.add_child(col)
-	floor.position = Vector3(0.0, -0.25, 0.0)
+	floor.position = Vector3(0.0, -4.0, 0.0)

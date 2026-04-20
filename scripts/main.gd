@@ -56,13 +56,9 @@ func _spawn_player() -> void:
 	if "facing" in player:
 		player.facing = Vector3(0.0, 0.0, 1.0)
 
-	# Camera follows player
+	# Cámara: rig bajo SubViewport, solo follow_target (ver pixel_camera_rig.attach_to_target).
 	if camera_rig.has_method("attach_to_target"):
 		camera_rig.attach_to_target(player)
-	if camera_rig.has_method("set_target"):
-		camera_rig.set_target(player)
-	if camera_rig.has_method("force_snap_to_target"):
-		camera_rig.force_snap_to_target()
 
 	# HUD binds to player signals
 	hud.connect_player(player)

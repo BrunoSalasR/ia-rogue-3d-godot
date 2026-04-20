@@ -512,12 +512,10 @@ func _force_nearest_texture_filter(root: Node) -> void:
 					dup.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
 					dup.specular_mode = BaseMaterial3D.SPECULAR_TOON
 					dup.metallic_specular = 0.0
-					dup.roughness = 0.92
-					# Null / clinical MC: subtle cool-violet multiply on Kay's baked albedo.
-					dup.albedo_color = dup.albedo_color * Color(1.045, 0.97, 1.08)
-					dup.rim_enabled = true
-					dup.rim = 0.045
-					dup.rim_tint = 0.35
+					dup.roughness = 0.96
+					# Keep baked atlas colors neutral like the reference devlog.
+					dup.albedo_color = dup.albedo_color
+					dup.rim_enabled = false
 					mi.set_surface_override_material(i, dup)
 	for child in root.get_children():
 		_force_nearest_texture_filter(child)

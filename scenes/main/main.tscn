@@ -9,19 +9,19 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_upscale"]
 shader = ExtResource("4_upscale")
 shader_parameter/texel_offset = Vector2(0, 0)
-shader_parameter/contrast_boost = 1.08
-shader_parameter/posterize_mix = 0.82
-shader_parameter/highlight_ceil = 0.94
-shader_parameter/palette_steps = 28.0
-shader_parameter/saturation_boost = 1.06
-shader_parameter/vignette_strength = 0.16
+shader_parameter/contrast_boost = 1.02
+shader_parameter/posterize_mix = 0.92
+shader_parameter/highlight_ceil = 0.97
+shader_parameter/palette_steps = 24.0
+shader_parameter/saturation_boost = 1.0
+shader_parameter/vignette_strength = 0.08
 
 [sub_resource type="Environment" id="Environment_world"]
 background_mode = 1
-background_color = Color(0.05, 0.06, 0.09, 1)
+background_color = Color(0.02, 0.02, 0.03, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.24, 0.28, 0.34, 1)
-ambient_light_energy = 0.55
+ambient_light_color = Color(0.18, 0.19, 0.22, 1)
+ambient_light_energy = 0.36
 glow_enabled = false
 glow_normalized = true
 glow_intensity = 0.0
@@ -38,11 +38,11 @@ shader_parameter/near_tint = Color(1.04, 1.01, 0.98, 1)
 shader_parameter/far_tint = Color(0.80, 0.88, 1.12, 1)
 shader_parameter/depth_tint_strength = 0.42
 shader_parameter/line_overlay = true
-shader_parameter/line_alpha = 0.83
+shader_parameter/line_alpha = 0.78
 shader_parameter/crease_overlay = true
-shader_parameter/crease_alpha = 0.70
+shader_parameter/crease_alpha = 0.62
 shader_parameter/kernel_radius = 1.0
-shader_parameter/zdelta_cutoff = 0.21
+shader_parameter/zdelta_cutoff = 0.24
 shader_parameter/angle_z_cutoff = 0.5
 shader_parameter/angle_z_scale = 2.0
 shader_parameter/convex_cutoff = 0.09
@@ -64,6 +64,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 stretch = true
+texture_filter = 0
 
 [node name="SubViewport" type="SubViewport" parent="SVContainer"]
 handle_input_locally = false
@@ -82,16 +83,16 @@ environment = SubResource("Environment_world")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SVContainer/SubViewport"]
 transform = Transform3D(0.70710677, -0.353553, 0.6123724, 0, 0.8660254, 0.5, -0.70710677, -0.353553, 0.6123724, 4, 15, 4)
-light_color = Color(1, 0.94, 0.86, 1)
-light_energy = 1.5
+light_color = Color(1, 0.95, 0.88, 1)
+light_energy = 1.42
 shadow_enabled = true
 directional_shadow_mode = 0
-directional_shadow_max_distance = 60.0
+directional_shadow_max_distance = 45.0
 directional_shadow_split_1 = 0.15
 directional_shadow_split_2 = 0.35
 directional_shadow_split_3 = 0.7
-shadow_bias = 0.04
-shadow_normal_bias = 0.5
+shadow_bias = 0.02
+shadow_normal_bias = 0.22
 shadow_opacity = 1.0
 shadow_blur = 0.0
 

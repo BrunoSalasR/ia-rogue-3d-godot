@@ -75,15 +75,11 @@ void fragment() {
 }
 
 void light() {
-	if (LIGHT_IS_DIRECTIONAL) {
-		float ndotl = max(0.0, dot(NORMAL, LIGHT));
-		float lit_raw = ndotl * ATTENUATION;
-		float nband = max(light_bands, 3.0);
-		float q = floor(lit_raw * nband + 0.5) / nband;
-		float lit_factor = mix(shadow_darkness, 1.0, q);
-		vec3 sun = LIGHT_COLOR * lit_factor;
-		// Cooler shadow tint so contact shadows pixel bands read against grout.
-		vec3 cool = mix(vec3(1.0), vec3(0.78, 0.86, 1.05), shadow_cool);
-		DIFFUSE_LIGHT += sun * cool;
-	}
+	float ndotl = max(0.0, dot(NORMAL, LIGHT));
+	float lit_raw = ndotl * ATTENUATION;
+	float nband = max(light_bands, 3.0);
+	float q = floor(lit_raw * nband + 0.5) / nband;
+	float lit_factor = mix(shadow_darkness, 1.0, q);
+	vec3 cool = mix(vec3(1.0), vec3(0.78, 0.86, 1.05), shadow_cool);
+	DIFFUSE_LIGHT += LIGHT_COLOR * lit_factor * cool;
 }
