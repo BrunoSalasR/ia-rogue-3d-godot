@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = "Stop"
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 
-$null = & gh auth status 2>&1
+cmd /c "gh auth status >nul 2>&1"
 if ($LASTEXITCODE -ne 0) {
     Write-Host "No hay sesion en GitHub CLI. Ejecuta primero: gh auth login" -ForegroundColor Yellow
     exit 1
