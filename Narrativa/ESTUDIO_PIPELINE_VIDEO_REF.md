@@ -2,7 +2,7 @@
 
 Este documento no busca “parecerse un poco”: define **qué es** el estilo en términos técnicos, **qué tenemos**, **qué falta**, y **qué no se resuelve** solo moviendo sliders. La base teórica pública más alineada con el vídeo que citas es el artículo de **David Holland** ([3D Pixel Art Rendering](https://www.davidhol.land/articles/3d-pixel-art-rendering/)), que explica explícitamente el trabajo de **t3ssel8r** y el pipeline que muchos confunden con “un filtro”.
 
-**Nota sobre tu MP4:** en este entorno no hay `ffmpeg` ni lectura binaria de vídeo; no pudimos muestrear fotogramas automáticamente. Para iteración objetiva, instala `ffmpeg` y extrae frames (`ffmpeg -i tu.mp4 -vf fps=1 ref_%04d.png`). Así puedes comparar lado a lado con capturas `--write-movie` del proyecto.
+**Frames de referencia:** en el repo, la carpeta `_ref_frames/` contiene PNG extraídos del vídeo del usuario (comando en `_ref_frames/README.md`). Úsalos para comparar con capturas `--write-movie` del proyecto.
 
 ---
 
