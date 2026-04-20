@@ -27,6 +27,9 @@ Thumbs.db
 *.log
 art_pass*.png
 movie_out/
+debug-captures/
+sim_check*.png
+sim_check*.avi
 
 # Python / tools (if added later)
 __pycache__/
